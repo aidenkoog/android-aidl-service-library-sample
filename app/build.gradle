@@ -3,7 +3,19 @@ plugins {
 }
 
 android {
-    compileSdkVersion 30
+    signingConfigs {
+        aidenkoog_build_key {
+            def keystorePropertiesFile = rootProject.file("keystore.properties")
+            def keystoreProperties = new Properties()
+            keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+        }
+    }
+    compileSdkVersion 33
     buildToolsVersion "30.0.3"
 
     defaultConfig {
@@ -18,6 +30,10 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.aidenkoog_build_key
+        }
+        debug {
+            signingConfig signingConfigs.aidenkoog_build_key
         }
     }
 
@@ -35,6 +51,7 @@ android {
     lintOptions {
         abortOnError false
     }
+    namespace 'io.github.aidenkoog.android.aidl_apptemplate'
 }
 
 dependencies {

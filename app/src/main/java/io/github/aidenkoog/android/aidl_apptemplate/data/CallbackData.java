@@ -1,5 +1,7 @@
 package io.github.aidenkoog.android.aidl_apptemplate.data;
 
+import io.github.aidenkoog.android.aidl_apptemplate.IAidlManagerCallback;
+
 public class CallbackData {
 
     private IAidlManagerCallback mManagerCallback;

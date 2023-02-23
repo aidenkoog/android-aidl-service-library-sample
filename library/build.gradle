@@ -1,17 +1,24 @@
-plugins {
-    id 'com.android.library'
-}
+apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 30
+    signingConfigs {
+        aidenkoog_build_key {
+            def keystorePropertiesFile = rootProject.file("keystore.properties")
+            def keystoreProperties = new Properties()
+            keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+        }
+    }
+    compileSdkVersion 33
     buildToolsVersion "30.0.3"
 
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 30
-        versionCode 1
-        versionName "1.0.0"
-
+        targetSdkVersion 33
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
     }
@@ -20,6 +27,10 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.aidenkoog_build_key
+        }
+        debug {
+            signingConfig signingConfigs.aidenkoog_build_key
         }
     }
 
@@ -28,13 +39,3 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 }
-
-task exportAar(type: Copy) {
-    from('build/outputs/aar/')
-    into('../library-release/')
-    include('library-release.aar')
-    def fileName = "library-release.aar"
-    rename('library-release.aar', fileName)
-}
-
-exportAar.dependsOn(build)

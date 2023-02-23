@@ -1,5 +1,6 @@
 package io.github.aidenkoog.android.aidl_apptemplate.manager;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.HandlerThread;
@@ -8,16 +9,19 @@ import android.os.RemoteException;
 import java.util.ConcurrentModificationException;
 
 import io.github.aidenkoog.android.aidl_apptemplate.ApiHandler;
-import io.github.aidenkoog.android.aidl_apptemplate.library.utils.DebugLogger;
+import io.github.aidenkoog.android.aidl_apptemplate.IAidlManager;
+import io.github.aidenkoog.android.aidl_apptemplate.IAidlManagerCallback;
+import io.github.aidenkoog.android.aidl_apptemplate.library.library.utils.DebugLogger;
 import io.github.aidenkoog.android.aidl_apptemplate.utils.Utils;
 
 import static io.github.aidenkoog.android.aidl_apptemplate.ApiCommand.*;
-import static io.github.aidenkoog.android.aidl_apptemplate.data.Constants.*;
+import static io.github.aidenkoog.android.aidl_apptemplate.library.data.Constants.*;
 
 public class AidlStubManager extends BaseAidlStubManager {
 
     private static final String TAG = AidlStubManager.class.getSimpleName();
 
+    @SuppressLint("StaticFieldLeak")
     private static AidlStubManager mAidlStubManager;
 
     public static AidlStubManager getStubManager(Context context) {
@@ -38,7 +42,7 @@ public class AidlStubManager extends BaseAidlStubManager {
         return mAidlManagerImpl;
     }
 
-    private IAidlManager.Stub mAidlManagerImpl = new IAidlManager.Stub() {
+    private final IAidlManager.Stub mAidlManagerImpl = new IAidlManager.Stub() {
 
         @Override
         public Bundle command(String command, Bundle params) {
@@ -49,15 +53,10 @@ public class AidlStubManager extends BaseAidlStubManager {
                 return null;
             }
 
-            switch (command) {
-                case CMD_TEST:
-                    // Synchronous
-                    break;
-                default:
-                    // Asynchronous
-                    mApiHandler.sendMessage(mApiHandler.obtainMessage(
-                            mApiHandler.getApiMessageWhat(), result));
-                    break;
+            if (CMD_TEST.equals(command)) {// Synchronous
+                DebugLogger.d(TAG, "synchronous command");
+            } else {// Asynchronous
+                mApiHandler.sendMessage(mApiHandler.obtainMessage(mApiHandler.getApiMessageWhat(), result));
             }
             return result;
         }
@@ -90,9 +89,6 @@ public class AidlStubManager extends BaseAidlStubManager {
                     }
                     mCallbackMap.put(callbackId, callback);
                 }
-
-                Utils.printCurrentCallbackMapState(mCallbackMap, callbackId, null);
-
                 Bundle result = new Bundle();
                 result.putString(KEY_COMMAND, ON_SERVICE_BOUND);
                 result.putString(KEY_CALLBACK_PACKAGE_NAME, mContext.getPackageName());
@@ -119,8 +115,6 @@ public class AidlStubManager extends BaseAidlStubManager {
 
             boolean isUnRegistered = false;
             if (callback != null) {
-                Utils.printCurrentCallbackMapState(mCallbackMap, null, callbackId);
-
                 Bundle result = new Bundle();
                 result.putString(KEY_COMMAND, ON_SERVICE_UNBOUND);
 
@@ -135,8 +129,7 @@ public class AidlStubManager extends BaseAidlStubManager {
                         mCallbackMap.remove(callbackId);
                         for (String key : mCallbackMap.keySet()) {
                             String[] splitedCallbackId = key.split(",");
-                            boolean isSamePackageNameExisting
-                                    = mCallbackMap.containsKey(splitedCallbackId[1]);
+                            boolean isSamePackageNameExisting = mCallbackMap.containsKey(splitedCallbackId[1]);
                             if (isSamePackageNameExisting) {
                                 mCallbackMap.remove(key);
                             }

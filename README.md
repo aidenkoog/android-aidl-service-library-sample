@@ -24,6 +24,7 @@ It is written based on Java.
 ## Release Note
 
 - 2023/02/21 : Upload Android-AIDL-Service-Manager template source code (Ref. cannot compile)
+- 2023/02/23 : Fix compile errors of testapp and service main app.
 
 ## Link
 

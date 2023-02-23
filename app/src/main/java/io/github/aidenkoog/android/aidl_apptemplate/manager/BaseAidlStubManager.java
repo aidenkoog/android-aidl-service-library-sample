@@ -5,7 +5,8 @@ import android.content.Context;
 import java.util.concurrent.ConcurrentHashMap;
 
 import io.github.aidenkoog.android.aidl_apptemplate.ApiHandler;
-import io.github.aidenkoog.android.aidl_apptemplate.library.utils.DebugLogger;
+import io.github.aidenkoog.android.aidl_apptemplate.IAidlManagerCallback;
+import io.github.aidenkoog.android.aidl_apptemplate.library.library.utils.DebugLogger;
 
 public class BaseAidlStubManager {
 

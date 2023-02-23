@@ -3,29 +3,21 @@ package io.github.aidenkoog.android.aidl_apptemplate.utils;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.DeadObjectException;
 import android.os.Message;
 import android.os.RemoteException;
 
-import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
 import io.github.aidenkoog.android.aidl_apptemplate.IAidlManagerCallback;
-import io.github.aidenkoog.android.aidl_apptemplate.data.CallbackData;
 
-import static io.github.aidenkoog.android.aidl_apptemplate.data.Constants.*;
+import static io.github.aidenkoog.android.aidl_apptemplate.library.data.Constants.*;
 
 public class Utils {
-
     private static final String TAG = Utils.class.getSimpleName();
 
-    public static String getPid(String packageName,
-                                ConcurrentHashMap<String, IAidlManagerCallback> callbackMap) {
+    public static String getPid(String packageName, ConcurrentHashMap<String, IAidlManagerCallback> callbackMap) {
 
-        Iterator<String> iterator = callbackMap.keySet().iterator();
-        while (iterator.hasNext()) {
-
-            String key = iterator.next();
+        for (String key : callbackMap.keySet()) {
             String[] splitedCallbackId = key.split(",");
             if (packageName.equals(splitedCallbackId[1])) {
                 return splitedCallbackId[0];
@@ -34,14 +26,9 @@ public class Utils {
         return null;
     }
 
-    public static void sendCallbackResult(boolean forNotify, Context context,
-                                          IAidlManagerCallback callback,
-                                          ConcurrentHashMap<String, IAidlManagerCallback> callbackMap,
-                                          Bundle result, String command) {
+    public static void sendCallbackResult(boolean forNotify, Context context, IAidlManagerCallback callback, ConcurrentHashMap<String, IAidlManagerCallback> callbackMap, Bundle result, String command) {
         try {
             callback.onCallbackResult(command, result);
-        } catch (DeadObjectException e) {
-            e.printStackTrace();
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -54,9 +41,7 @@ public class Utils {
         context.sendBroadcast(intent);
     }
 
-    public static Bundle inspectMessage(
-            Message message, int apiType,
-            ConcurrentHashMap<String, IAidlManagerCallback> callbackMap) {
+    public static Bundle inspectMessage(Message message, int apiType, ConcurrentHashMap<String, IAidlManagerCallback> callbackMap) {
         Bundle result;
         if (isCorrectMessageWhat(message, apiType)) {
             result = getResultBundle(message);

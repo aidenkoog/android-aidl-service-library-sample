@@ -1,7 +1,7 @@
 package io.github.aidenkoog.android.testapp;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -22,7 +22,7 @@ import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import io.github.aidenkoog.android.aidl_apptemplate.library.AidlManager;
+import io.github.aidenkoog.android.aidl_apptemplate.library.library.AidlManager;
 import io.github.aidenkoog.android.testapp.ui.TestCase;
 import io.github.aidenkoog.android.testapp.ui.TestInterface;
 import io.github.aidenkoog.android.testapp.utils.Constants;
@@ -33,7 +33,6 @@ import java.util.Date;
 
 public class MainActivity extends Activity implements Handler.Callback {
     private static final String TAG = MainActivity.class.getSimpleName();
-
     private static final int LIST_ITEM_MINIMUM_WIDTH = 50;
     private static final int LIST_ITEM_MINIMUM_HEIGHT = 25;
     private static final float LOG_SCREEN_FONT_SIZE = 7.5f;
@@ -47,7 +46,6 @@ public class MainActivity extends Activity implements Handler.Callback {
     private Handler mHandler;
     private SimpleDateFormat mTimeFormat;
     private ArrayAdapter<TestCase> mAdapter;
-    private Context mContext;
     private int mTestSequence = 0;
     private boolean mBlock = false;
 
@@ -78,11 +76,11 @@ public class MainActivity extends Activity implements Handler.Callback {
         return super.onKeyDown(keyCode, event);
     }
 
+    @SuppressLint("SimpleDateFormat")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mContext = this;
         mTimeFormat = new SimpleDateFormat("HH:mm:ss.SSS");
         mHandler = new Handler(this);
 
@@ -94,12 +92,12 @@ public class MainActivity extends Activity implements Handler.Callback {
 
         final Typeface type = Typeface.createFromAsset(getAssets(), FONT_PATH);
         mAdapter = new ArrayAdapter<TestCase>(this, android.R.layout.simple_list_item_2) {
+            @SuppressLint("InflateParams")
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
                 View view = convertView;
                 if (view == null) {
-                    view = LayoutInflater.from(MainActivity.this).
-                            inflate(android.R.layout.simple_list_item_2, null);
+                    view = LayoutInflater.from(MainActivity.this).inflate(android.R.layout.simple_list_item_2, null);
                 }
                 view.setMinimumWidth(LIST_ITEM_MINIMUM_WIDTH);
                 view.setMinimumHeight(LIST_ITEM_MINIMUM_HEIGHT);
@@ -161,10 +159,7 @@ public class MainActivity extends Activity implements Handler.Callback {
         final Typeface type = Typeface.createFromAsset(getAssets(), FONT_PATH);
         view.setTypeface(type);
 
-        mContainer.addView(view,
-                new LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT));
+        mContainer.addView(view, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         scrollToBottom();
 
         return view;
@@ -224,8 +219,7 @@ public class MainActivity extends Activity implements Handler.Callback {
 
             String time = "[" + mTimeFormat.format(new Date()) + "] ";
             SpannableStringBuilder sb = new SpannableStringBuilder(time + lv + " " + msg + "\n");
-            sb.setSpan(new ForegroundColorSpan(Color.YELLOW), 0,
-                    time.length() - 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            sb.setSpan(new ForegroundColorSpan(Color.YELLOW), 0, time.length() - 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             if (span != null) {
                 sb.setSpan(span, time.length(), sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
@@ -235,13 +229,10 @@ public class MainActivity extends Activity implements Handler.Callback {
     }
 
     private void scrollToBottom() {
-        mScrollView.post(new Runnable() {
-            @Override
-            public void run() {
-                mScrollView.fullScroll(ScrollView.FOCUS_DOWN);
-                if (mScrollView.hasFocus()) {
-                    mListView.requestFocus();
-                }
+        mScrollView.post(() -> {
+            mScrollView.fullScroll(ScrollView.FOCUS_DOWN);
+            if (mScrollView.hasFocus()) {
+                mListView.requestFocus();
             }
         });
     }
@@ -250,10 +241,8 @@ public class MainActivity extends Activity implements Handler.Callback {
 
     @Override
     public boolean handleMessage(Message msg) {
-        switch (msg.what) {
-            case MSG_LOG:
-                onLog(msg.arg1, (String) msg.obj);
-                break;
+        if (msg.what == MSG_LOG) {
+            onLog(msg.arg1, (String) msg.obj);
         }
         return false;
     }

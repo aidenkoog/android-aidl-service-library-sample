@@ -9,6 +9,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface TestInterface {
     String name() default "";
+
     String description() default "";
+
     boolean runOnBackground() default false;
 }

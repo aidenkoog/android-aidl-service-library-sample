@@ -1,5 +1,6 @@
 package io.github.aidenkoog.android.testapp.ui;
 
+import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 
 import java.lang.reflect.Method;
@@ -20,6 +21,7 @@ public abstract class TestCase {
 
     protected abstract Object execute() throws Exception;
 
+    @SuppressLint("StaticFieldLeak")
     public void execute(final OnSuccessListener onSuccess, final OnFailureListener onFailure) {
         if (runOnBackground) {
             new AsyncTask<Void, Void, Object>() {
@@ -62,8 +64,7 @@ public abstract class TestCase {
 
     public static List<TestCase> setup(final Object target) {
 
-        List<TestCase> testCases = new ArrayList<TestCase>();
-
+        List<TestCase> testCases = new ArrayList<>();
         for (final Method method : target.getClass().getDeclaredMethods()) {
             method.setAccessible(true);
 
@@ -71,13 +72,11 @@ public abstract class TestCase {
             if (testCase == null) {
                 continue;
             }
-
             if (method.getParameterTypes().length != 0) {
                 continue;
             }
 
             String name;
-
             if (testCase.name().isEmpty()) {
                 name = method.getName();
             } else {
@@ -94,5 +93,4 @@ public abstract class TestCase {
         }
         return testCases;
     }
-
 }

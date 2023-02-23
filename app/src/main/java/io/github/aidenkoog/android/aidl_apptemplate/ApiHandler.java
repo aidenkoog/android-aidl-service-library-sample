@@ -6,11 +6,11 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
-import io.github.aidenkoog.android.aidl_apptemplate.library.utils.DebugLogger;
+import io.github.aidenkoog.android.aidl_apptemplate.library.library.utils.DebugLogger;
 import io.github.aidenkoog.android.aidl_apptemplate.utils.Utils;
 
 import static io.github.aidenkoog.android.aidl_apptemplate.ApiCommand.*;
-import static io.github.aidenkoog.android.aidl_apptemplate.data.Constants.*;
+import static io.github.aidenkoog.android.aidl_apptemplate.library.data.Constants.*;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -25,8 +25,7 @@ public class ApiHandler extends Handler {
         return MSG_API;
     }
 
-    public ApiHandler(Context context, Looper lopper,
-                      ConcurrentHashMap<String, IAidlManagerCallback> callbackMap) {
+    public ApiHandler(Context context, Looper lopper, ConcurrentHashMap<String, IAidlManagerCallback> callbackMap) {
         super(lopper);
         mContext = context;
         mCallbackMap = callbackMap;
@@ -38,18 +37,13 @@ public class ApiHandler extends Handler {
         if (result == null) {
             return;
         }
-
         String cmdString = result.getString(KEY_COMMAND);
         if (cmdString == null) {
             return;
         }
-
-        switch (cmdString) {
-            case CMD_TEST:
-                break;
-
-            default:
-                DebugLogger.d(TAG, "unhandled command : " + cmdString);
+        if (CMD_TEST.equals(cmdString)) {
+        } else {
+            DebugLogger.d(TAG, "unhandled command : " + cmdString);
         }
         super.handleMessage(message);
     }

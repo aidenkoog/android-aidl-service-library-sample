@@ -1,4 +1,4 @@
-## Android Java AIDL Service-Manager Project.
+## Android AIDL service library sample
 
 #### Continue to study and ponder to improve the code structure.
 
